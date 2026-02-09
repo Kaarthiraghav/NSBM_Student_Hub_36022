@@ -3,6 +3,8 @@ package com.example.NSBM_Student_Hub.service;
 import com.example.NSBM_Student_Hub.model.Student;
 import com.example.NSBM_Student_Hub.repository.StudentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -24,6 +26,11 @@ public class StudentService {
         return studentRepository.findAll();
     }
     
+    // Get all students with pagination and sorting
+    public Page<Student> getAllStudents(Pageable pageable) {
+        return studentRepository.findAll(pageable);
+    }
+    
     // Get student by ID
     public Optional<Student> getStudentById(Long id) {
         return studentRepository.findById(id);
@@ -35,13 +42,13 @@ public class StudentService {
     }
     
     // Get students by batch
-    public List<Student> getStudentsByBatch(String batch) {
-        return studentRepository.findByBatch(batch);
+    public Page<Student> getStudentsByBatch(String batch, Pageable pageable) {
+        return studentRepository.findByBatch(batch, pageable);
     }
     
     // Search students by name
-    public List<Student> searchByName(String name) {
-        return studentRepository.findByNameContainingIgnoreCase(name);
+    public Page<Student> searchByName(String name, Pageable pageable) {
+        return studentRepository.findByNameContainingIgnoreCase(name, pageable);
     }
     
     // Update student

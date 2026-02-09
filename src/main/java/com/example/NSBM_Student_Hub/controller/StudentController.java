@@ -3,6 +3,10 @@ package com.example.NSBM_Student_Hub.controller;
 import com.example.NSBM_Student_Hub.model.Student;
 import com.example.NSBM_Student_Hub.service.StudentService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,10 +29,27 @@ public class StudentController {
         return ResponseEntity.status(HttpStatus.CREATED).body(createdStudent);
     }
     
-    // READ - Get all students
-    @GetMapping
+    // READ - Get all students (without pagination)
+    @GetMapping("/all")
     public ResponseEntity<List<Student>> getAllStudents() {
         List<Student> students = studentService.getAllStudents();
+        return ResponseEntity.ok(students);
+    }
+    
+    // READ - Get all students with pagination and sorting
+    @GetMapping
+    public ResponseEntity<Page<Student>> getAllStudentsPaginated(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "asc") String sortDirection) {
+        
+        Sort sort = sortDirection.equalsIgnoreCase("desc") 
+                ? Sort.by(sortBy).descending() 
+                : Sort.by(sortBy).ascending();
+        
+        Pageable pageable = PageRequest.of(page, size, sort);
+        Page<Student> students = studentService.getAllStudents(pageable);
         return ResponseEntity.ok(students);
     }
     
@@ -48,17 +69,39 @@ public class StudentController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
     
-    // READ - Get students by batch
+    // READ - Get students by batch with pagination
     @GetMapping("/batch/{batch}")
-    public ResponseEntity<List<Student>> getStudentsByBatch(@PathVariable String batch) {
-        List<Student> students = studentService.getStudentsByBatch(batch);
+    public ResponseEntity<Page<Student>> getStudentsByBatch(
+            @PathVariable String batch,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "asc") String sortDirection) {
+        
+        Sort sort = sortDirection.equalsIgnoreCase("desc") 
+                ? Sort.by(sortBy).descending() 
+                : Sort.by(sortBy).ascending();
+        
+        Pageable pageable = PageRequest.of(page, size, sort);
+        Page<Student> students = studentService.getStudentsByBatch(batch, pageable);
         return ResponseEntity.ok(students);
     }
     
-    // READ - Search students by name
+    // READ - Search students by name with pagination
     @GetMapping("/search/{name}")
-    public ResponseEntity<List<Student>> searchByName(@PathVariable String name) {
-        List<Student> students = studentService.searchByName(name);
+    public ResponseEntity<Page<Student>> searchByName(
+            @PathVariable String name,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "asc") String sortDirection) {
+        
+        Sort sort = sortDirection.equalsIgnoreCase("desc") 
+                ? Sort.by(sortBy).descending() 
+                : Sort.by(sortBy).ascending();
+        
+        Pageable pageable = PageRequest.of(page, size, sort);
+        Page<Student> students = studentService.searchByName(name, pageable);
         return ResponseEntity.ok(students);
     }
     
